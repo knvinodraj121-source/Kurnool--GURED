@@ -65,16 +65,19 @@
             });
         }
     }
-
-    // వాట్సాప్ పంపడానికి
+  
     function sendEmergencyAlert() {
-        let message = "🚨 *అత్యవసర రిపోర్ట్ (GURED)*\n\n📍 *యాక్సిడెంట్ లొకేషన్:* " + finalMapLink + "\n📸 *గమనిక:* నేను ఫోటో తీశాను, అటాచ్ చేస్తున్నాను.";
-        
-        // మీ నంబర్ ఇక్కడ ఇవ్వండి
-        let myNumber = "918712070788"; 
-        let waUrl = "https://wa.me/" + myNumber + "?text=" + encodeURIComponent(message);
+    let message = "🚨 *అత్యవసర రిపోర్ట్ (GURED)*\n\n📍 *లొకేషన్:* " + finalMapLink + "\n📸 *గమనిక:* ఫోటో తీశాను, అటాచ్ చేస్తున్నాను.";
+    
+    // ఇక్కడ నంబర్ అడుగుతుంది, ఏదీ ఇవ్వకపోతే 108 కి వెళ్తుంది
+    let targetNumber = prompt("ఎవరికి అలర్ట్ పంపాలి? (నంబర్ ఇవ్వండి లేదా 108 అని ఉంచండి):", "108");
+    
+    if (targetNumber != null) {
+        let waUrl = "https://wa.me/" + targetNumber + "?text=" + encodeURIComponent(message);
         window.open(waUrl, '_blank');
     }
+    }
+                    
 </script>
 
 </body>
