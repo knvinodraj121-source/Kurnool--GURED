@@ -52,31 +52,34 @@
     }
 
     // లొకేషన్ కనుక్కోవడానికి
-    function getFastLocation() {
-        let status = document.getElementById("status");
-        if (navigator.geolocation) {
-            status.innerHTML = "⏳ లొకేషన్ వెతుకుతున్నాము...";
-            navigator.geolocation.getCurrentPosition(function(position) {
-                finalMapLink = "https://www.google.com/maps?q=" + position.coords.latitude + "," + position.coords.longitude;
-                status.innerHTML = "✅ లొకేషన్ దొరికింది!";
-                status.style.color = "#2f855a";
-                document.getElementById("locBtn").style.display = "none";
-                document.getElementById("waBtn").style.display = "block";
-            });
+// లొకేషన్ ఖచ్చితంగా కనుక్కోవడానికి
+function getFastLocation() {
+    let status = document.getElementById("status");
+    if (navigator.geolocation) {
+        status.innerHTML = "⏳ వెతుకుతున్నాము (High Accuracy)...";
+        
+        navigator.geolocation.getCurrentPosition(function(position) {
+            let lat = position.coords.latitude;
+            let lon = position.coords.longitude;
+            // ఖచ్చితమైన మ్యాప్ లింక్
+            finalMapLink = "https://www.google.com/maps?q=" + lat + "," + lon;
         }
+            status.innerHTML = "✅ లొకేషన్ దొరికింది!";
+            status.style.color = "#2f855a";
+            document.getElementById("locBtn").style.display = "none";
+            document.getElementById("waBtn").style.display = "block";
+        }, function(error) {
+            status.innerHTML = "❌ లొకేషన్ దొరకలేదు. దయచేసి GPS ఆన్ చేయండి.";
+        }, {
+            enableHighAccuracy: true,  // ఇది ఖచ్చితమైన లొకేషన్ ఇస్తుంది
+            timeout: 10000,            // 10 సెకన్ల వరకు వెతుకుతుంది
+            maximumAge: 0              // పాత లొకేషన్ డేటాను వాడదు
+        });
     }
-  
+            }
+                                                 
     function sendEmergencyAlert() {
     let message = "🚨 *అత్యవసర రిపోర్ట్ (GURED)*\n\n📍 *లొకేషన్:* " + finalMapLink + "\n📸 *గమనిక:* ఫోటో తీశాను, అటాచ్ చేస్తున్నాను.";
-    
-    // ఇక్కడ నంబర్ అడుగుతుంది, ఏదీ ఇవ్వకపోతే 108 కి వెళ్తుంది
-    let targetNumber = prompt("ఎవరికి అలర్ట్ పంపాలి? (నంబర్ ఇవ్వండి లేదా 108 అని ఉంచండి):", "108");
-    
-    if (targetNumber != null) {
-        let waUrl = "https://wa.me/" + targetNumber + "?text=" + encodeURIComponent(message);
-        window.open(waUrl, '_blank');
-    }
-    }
                     
 </script>
 
