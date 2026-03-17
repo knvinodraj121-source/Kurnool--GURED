@@ -3,56 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GURED - టెస్టింగ్ మోడ్</title>
+    <title>GURED - ఎమర్జెన్సీ హెల్ప్</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #e3f2fd; text-align: center; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); max-width: 400px; margin: auto; }
-        h1 { color: #1565c0; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin: 10px 0; }
-        .btn-loc { background-color: #1565c0; color: white; }
-        .btn-wa { background-color: #25D366; color: white; }
-        #status { color: #d32f2f; font-weight: bold; margin: 10px; }
+        body { font-family: Arial, sans-serif; background-color: #f8d7da; text-align: center; padding: 15px; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); max-width: 400px; margin: auto; border-top: 8px solid #d32f2f; }
+        h2 { color: #d32f2f; margin-bottom: 5px; }
+        .step { background: #fff5f5; padding: 10px; border-radius: 10px; margin: 10px 0; border: 1px solid #feb2b2; }
+        #preview { width: 100%; border-radius: 10px; margin-top: 10px; display: none; }
+        .btn { width: 100%; padding: 18px; margin-top: 10px; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .btn-upload { background-color: #4a5568; color: white; }
+        .btn-loc { background-color: #e53e3e; color: white; }
+        .btn-wa { background-color: #38a169; color: white; display: none; }
+        #status { color: #c53030; font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h1>🛠️ టెస్టింగ్ మోడ్</h1>
-    <p>ముందుగా లొకేషన్ బటన్ నొక్కి, ఆపై వాట్సాప్ బటన్ నొక్కండి.</p>
+    <h2>🚨 GURED రిపోర్టర్</h2>
+    <p>యాక్సిడెంట్ జరిగితే వెంటనే రిపోర్ట్ చేయండి</p>
 
-    <p id="status">లొకేషన్ కోసం వేచి చూస్తున్నాం...</p>
+    <div class="step">
+        <label><b>1. ఘటన ఫోటో తీయండి:</b></label>
+        <input type="file" accept="image/*" capture="camera" id="incidentPhoto" onchange="previewImage()" style="display: none;">
+        <button class="btn btn-upload" onclick="document.getElementById('incidentPhoto').click()">📸 కెమెరా ఓపెన్ చేయి</button>
+        <img id="preview" src="" alt="ప్రివ్యూ">
+    </div>
 
-    <button class="btn btn-loc" onclick="getTestLocation()">1. నా లొకేషన్ కనుక్కో</button>
-    
-    <button class="btn btn-wa" onclick="sendTestWhatsApp()">2. నాకు నేనే మెసేజ్ పంపుకుంటాను</button>
+    <button class="btn btn-loc" id="locBtn" onclick="getFastLocation()">2. లొకేషన్ ఫిక్స్ చేయి</button>
+    <p id="status"></p>
+
+    <button class="btn btn-wa" id="waBtn" onclick="sendEmergencyAlert()">3. వాట్సాప్ అలర్ట్ పంపు</button>
 </div>
 
 <script>
-    let testLocation = "";
+    let finalMapLink = "";
 
-    function getTestLocation() {
+    // ఫోటో ప్రివ్యూ చూపించడానికి
+    function previewImage() {
+        const file = document.getElementById('incidentPhoto').files[0];
+        const preview = document.getElementById('preview');
+        const reader = new FileReader();
+        reader.onloadend = function() {
+            preview.src = reader.result;
+            preview.style.display = "block";
+        }
+        if (file) { reader.readAsDataURL(file); }
+    }
+
+    // లొకేషన్ కనుక్కోవడానికి
+    function getFastLocation() {
+        let status = document.getElementById("status");
         if (navigator.geolocation) {
-            document.getElementById("status").innerHTML = "వెతుకుతున్నాము...";
+            status.innerHTML = "⏳ లొకేషన్ వెతుకుతున్నాము...";
             navigator.geolocation.getCurrentPosition(function(position) {
-                testLocation = "https://www.google.com/maps?q=" + position.coords.latitude + "," + position.coords.longitude;
-                document.getElementById("status").innerHTML = "✅ లొకేషన్ రెడీ అయింది!";
-                alert("మీ లొకేషన్ దొరికింది! ఇప్పుడు వాట్సాప్ బటన్ నొక్కండి.");
+                finalMapLink = "https://www.google.com/maps?q=" + position.coords.latitude + "," + position.coords.longitude;
+                status.innerHTML = "✅ లొకేషన్ దొరికింది!";
+                status.style.color = "#2f855a";
+                document.getElementById("locBtn").style.display = "none";
+                document.getElementById("waBtn").style.display = "block";
             });
-        } else {
-            alert("Location సపోర్ట్ చేయడం లేదు.");
         }
     }
 
-    function sendTestWhatsApp() {
-        if (testLocation === "") {
-            alert("ముందుగా లొకేషన్ బటన్ నొక్కండి!");
-            return;
-        }
-        // ఇక్కడ 91 పక్కన మీ మొబైల్ నంబర్ టైప్ చేయండి
+    // వాట్సాప్ పంపడానికి
+    function sendEmergencyAlert() {
+        let message = "🚨 *అత్యవసర రిపోర్ట్ (GURED)*\n\n📍 *యాక్సిడెంట్ లొకేషన్:* " + finalMapLink + "\n📸 *గమనిక:* నేను ఫోటో తీశాను, అటాచ్ చేస్తున్నాను.";
+        
+        // మీ నంబర్ ఇక్కడ ఇవ్వండి
         let myNumber = "918712070788"; 
-        let message = "🛠️ ఇది GURED టెస్ట్ మెసేజ్!\n📍 నా ప్రస్తుత లొకేషన్: " + testLocation;
-        let whatsappUrl = "https://wa.me/" + myNumber + "?text=" + encodeURIComponent(message);
-        window.open(whatsappUrl, '_blank');
+        let waUrl = "https://wa.me/" + myNumber + "?text=" + encodeURIComponent(message);
+        window.open(waUrl, '_blank');
     }
 </script>
 
