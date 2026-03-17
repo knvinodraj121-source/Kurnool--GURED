@@ -1,21 +1,60 @@
-<button onclick="sendEmergencyWhatsApp()" style="background-color: #25D366; color: white; font-weight: bold;">
-    Direct WhatsApp Alert (అత్యవసర సహాయం)
-</button>
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GURED - టెస్టింగ్ మోడ్</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #e3f2fd; text-align: center; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); max-width: 400px; margin: auto; }
+        h1 { color: #1565c0; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin: 10px 0; }
+        .btn-loc { background-color: #1565c0; color: white; }
+        .btn-wa { background-color: #25D366; color: white; }
+        #status { color: #d32f2f; font-weight: bold; margin: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🛠️ టెస్టింగ్ మోడ్</h1>
+    <p>ముందుగా లొకేషన్ బటన్ నొక్కి, ఆపై వాట్సాప్ బటన్ నొక్కండి.</p>
+
+    <p id="status">లొకేషన్ కోసం వేచి చూస్తున్నాం...</p>
+
+    <button class="btn btn-loc" onclick="getTestLocation()">1. నా లొకేషన్ కనుక్కో</button>
+    
+    <button class="btn btn-wa" onclick="sendTestWhatsApp()">2. నాకు నేనే మెసేజ్ పంపుకుంటాను</button>
+</div>
 
 <script>
-function sendEmergencyWhatsApp() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            var lat = position.coords.latitude;
-            var lon = position.coords.longitude;
-            var message = "అత్యవసర సహాయం కావాలి! ప్రమాదం జరిగిన లొకేషన్: https://www.google.com/maps?q=" + lat + "," + lon;
-            
-            // ఇక్కడ 108 లేదా ఎమర్జెన్సీ నంబర్ ఇవ్వవచ్చు
-            var whatsappUrl = "https://wa.me/91XXXXXXXXXX?text=" + encodeURIComponent(message);
-            window.open(whatsappUrl, '_blank');
-        });
-    } else {
-        alert("లొకేషన్ పర్మిషన్ ఇవ్వండి.");
+    let testLocation = "";
+
+    function getTestLocation() {
+        if (navigator.geolocation) {
+            document.getElementById("status").innerHTML = "వెతుకుతున్నాము...";
+            navigator.geolocation.getCurrentPosition(function(position) {
+                testLocation = "https://www.google.com/maps?q=" + position.coords.latitude + "," + position.coords.longitude;
+                document.getElementById("status").innerHTML = "✅ లొకేషన్ రెడీ అయింది!";
+                alert("మీ లొకేషన్ దొరికింది! ఇప్పుడు వాట్సాప్ బటన్ నొక్కండి.");
+            });
+        } else {
+            alert("Location సపోర్ట్ చేయడం లేదు.");
+        }
     }
-}
+
+    function sendTestWhatsApp() {
+        if (testLocation === "") {
+            alert("ముందుగా లొకేషన్ బటన్ నొక్కండి!");
+            return;
+        }
+        // ఇక్కడ 91 పక్కన మీ మొబైల్ నంబర్ టైప్ చేయండి
+        let myNumber = "918712070788"; 
+        let message = "🛠️ ఇది GURED టెస్ట్ మెసేజ్!\n📍 నా ప్రస్తుత లొకేషన్: " + testLocation;
+        let whatsappUrl = "https://wa.me/" + myNumber + "?text=" + encodeURIComponent(message);
+        window.open(whatsappUrl, '_blank');
+    }
 </script>
+
+</body>
+</html>
