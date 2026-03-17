@@ -12,8 +12,9 @@
         .btn-upload { background-color: #4a5568; color: white; }
         .btn-loc { background-color: #e53e3e; color: white; }
         .btn-wa { background-color: #38a169; color: white; display: none; }
-        #preview { width: 100%; border-radius: 10px; margin-top: 15px; display: none; border: 2px solid #ddd; }
-        #status { color: #d32f2f; font-weight: bold; margin-top: 10px; }
+        /* ఫోటో ప్రివ్యూ స్టైల్ */
+        #preview { width: 100%; border-radius: 10px; margin-top: 15px; display: none; border: 2px solid #ddd; max-height: 300px; object-fit: cover; }
+        #status { color: #d32f2f; font-weight: bold; margin-top: 10px; min-height: 20px; }
     </style>
 </head>
 <body>
@@ -36,30 +37,29 @@
 <script>
     let finalMapLink = "";
 
+    // ఫోటో చూపించే ఫంక్షన్
     function previewImage() {
-        const file = document.getElementById('incidentPhoto').files[0];
+        const fileInput = document.getElementById('incidentPhoto');
         const preview = document.getElementById('preview');
-        const reader = new FileReader();
         
-        reader.onloadend = function() {
-            preview.src = reader.result;
-            preview.style.display = "block"; // ఫోటోను చూపిస్తుంది
-        }
-        
-        if (file) {
-            reader.readAsDataURL(file);
+        if (fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = "block"; // ఫోటోను చూపిస్తుంది
+            };
+            reader.readAsDataURL(fileInput.files[0]);
         }
     }
 
+    // లొకేషన్ కనుక్కోవడం
     function getFastLocation() {
         let status = document.getElementById("status");
         if (navigator.geolocation) {
             status.innerHTML = "⏳ ఖచ్చితమైన లొకేషన్ కోసం వెతుకుతున్నాము...";
-            
             navigator.geolocation.getCurrentPosition((pos) => {
                 let lat = pos.coords.latitude;
                 let lon = pos.coords.longitude;
-                // గూగుల్ మ్యాప్స్ లో ఖచ్చితమైన పాయింట్ లింక్
                 finalMapLink = "https://www.google.com/maps?q=" + lat + "," + lon;
                 
                 status.innerHTML = "✅ లొకేషన్ దొరికింది!";
@@ -67,21 +67,20 @@
                 document.getElementById("locBtn").style.display = "none";
                 document.getElementById("waBtn").style.display = "block";
             }, (err) => {
-                status.innerHTML = "❌ లొకేషన్ దొరకలేదు. GPS పర్మిషన్ ఇవ్వండి.";
-            }, {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            });
+                status.innerHTML = "❌ లొకేషన్ దొరకలేదు. GPS ఆన్ చేయండి.";
+            }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
         }
     }
 
+    // వాట్సాప్ అలర్ట్ - ఆటోమేటిక్ 91
     function sendEmergencyAlert() {
         let message = "🚨 *అత్యవసర రిపోర్ట్ (GURED)*\n\n📍 *యాక్సిడెంట్ లొకేషన్:* " + finalMapLink;
-        let target = prompt("ఎవరికి పంపాలి? (10 అంకెల నంబర్ ఇవ్వండి):", "108");
+        
+        // బాక్స్‌లో 91 ముందే ఉంటుంది
+        let target = prompt("ఎవరికి పంపాలి? (నంబర్ ఇవ్వండి):", "91");
         
         if (target) {
-            // 10 అంకెలు ఉంటే ఆటోమేటిక్ గా 91 కలుపుతుంది
+            // ఒకవేళ యూజర్ 91 లేకుండా కేవలం 10 అంకెలు ఇస్తే, 91 కలుపుతుంది
             if (target.length === 10 && !isNaN(target)) {
                 target = "91" + target;
             }
