@@ -1,11 +1,21 @@
-<!DOCTYPE html>
-<html lang="te">
-<head>
-    <meta charset="UTF-8">
-    <title>కర్నూలు - GURED</title>
-</head>
-<body style="font-family: Arial; text-align: center; padding: 50px;">
-    <h1 style="color: #b30000;">కర్నూలు - GURED వెబ్‌సైట్</h1>
-    <p>ఈ పేజీ విజయవంతంగా లోడ్ అయింది!</p>
-</body>
-</html>
+<button onclick="sendEmergencyWhatsApp()" style="background-color: #25D366; color: white; font-weight: bold;">
+    Direct WhatsApp Alert (అత్యవసర సహాయం)
+</button>
+
+<script>
+function sendEmergencyWhatsApp() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+            var message = "అత్యవసర సహాయం కావాలి! ప్రమాదం జరిగిన లొకేషన్: https://www.google.com/maps?q=" + lat + "," + lon;
+            
+            // ఇక్కడ 108 లేదా ఎమర్జెన్సీ నంబర్ ఇవ్వవచ్చు
+            var whatsappUrl = "https://wa.me/91XXXXXXXXXX?text=" + encodeURIComponent(message);
+            window.open(whatsappUrl, '_blank');
+        });
+    } else {
+        alert("లొకేషన్ పర్మిషన్ ఇవ్వండి.");
+    }
+}
+</script>
