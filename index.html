@@ -4,83 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GURED - ఎమర్జెన్సీ హెల్ప్</title>
-    
     <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
     <style>
         body { font-family: Arial, sans-serif; background-color: #f8d7da; text-align: center; padding: 15px; }
         .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); max-width: 400px; margin: auto; border-top: 8px solid #d32f2f; }
-        .btn { width: 100%; padding: 18px; margin-top: 10px; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn { width: 100%; padding: 18px; margin-top: 10px; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; }
         .btn-upload { background-color: #4a5568; color: white; }
         .btn-loc { background-color: #e53e3e; color: white; }
         .btn-wa { background-color: #38a169; color: white; display: none; }
         #preview { width: 100%; border-radius: 10px; margin-top: 10px; display: none; }
-        #status { color: #c53030; font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h2>🚨 GURED రిపోర్టర్</h2>
-    <p>యాక్సిడెంట్ జరిగితే వెంటనే రిపోర్ట్ చేయండి</p>
-
     <input type="file" accept="image/*" capture="camera" id="incidentPhoto" onchange="previewImage()" style="display: none;">
     <button class="btn btn-upload" onclick="document.getElementById('incidentPhoto').click()">📸 ఫోటో తీయండి</button>
-    <img id="preview" src="" alt="ప్రివ్యూ">
-
+    <img id="preview" src="">
     <button class="btn btn-loc" id="locBtn" onclick="getFastLocation()">📍 లొకేషన్ ఫిక్స్ చేయి</button>
     <p id="status"></p>
-
     <button class="btn btn-wa" id="waBtn" onclick="sendEmergencyAlert()">📲 వాట్సాప్ అలర్ట్ పంపు</button>
 </div>
 
 <script>
     let finalMapLink = "";
 
-    // ఫోటో ప్రివ్యూ చూపించడానికి
     function previewImage() {
         const file = document.getElementById('incidentPhoto').files[0];
         const preview = document.getElementById('preview');
         const reader = new FileReader();
-        reader.onloadend = function() {
-            preview.src = reader.result;
-            preview.style.display = "block";
-        }
-        if (file) { reader.readAsDataURL(file); }
+        reader.onloadend = () => { preview.src = reader.result; preview.style.display = "block"; }
+        if (file) reader.readAsDataURL(file);
     }
 
-    // హై-అక్యురసీ లొకేషన్ కోసం
     function getFastLocation() {
         let status = document.getElementById("status");
         if (navigator.geolocation) {
-            status.innerHTML = "⏳ వెతుకుతున్నాము (High Accuracy)...";
-            navigator.geolocation.getCurrentPosition(function(pos) {
-                let lat = pos.coords.latitude;
-                let lon = pos.coords.longitude;
-                // ఖచ్చితమైన మ్యాప్ లింక్
-                finalMapLink = "https://www.google.com/maps?q=" + lat + "," + lon;
+            status.innerHTML = "⏳ ఖచ్చితమైన లొకేషన్ కోసం వెతుకుతున్నాము...";
+            navigator.geolocation.getCurrentPosition((pos) => {
+                // ఖచ్చితమైన మ్యాప్ లింక్ క్రియేట్ చేయడం
+                finalMapLink = "https://www.google.com/maps?q=" + pos.coords.latitude + "," + pos.coords.longitude;
                 status.innerHTML = "✅ లొకేషన్ దొరికింది!";
-                status.style.color = "#2f855a";
                 document.getElementById("locBtn").style.display = "none";
                 document.getElementById("waBtn").style.display = "block";
-            }, function(err) {
-                status.innerHTML = "❌ GPS ఆన్ చేసి మళ్ళీ ప్రయత్నించండి.";
+            }, (err) => {
+                status.innerHTML = "❌ లొకేషన్ దొరకలేదు. GPS ఆన్ చేయండి.";
             }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
         }
     }
 
-    // వాట్సాప్ అలర్ట్ పంపడం
     function sendEmergencyAlert() {
-        let message = "🚨 *అత్యవసర రిపోర్ట్ (GURED)*\n\n📍 *లొకేషన్:* " + finalMapLink + "\n📸 *గమనిక:* ఫోటో తీశాను, అటాచ్ చేస్తున్నాను.";
-        let targetNumber = prompt("ఎవరికి అలర్ట్ పంపాలి? (నంబర్ ఇవ్వండి లేదా 108 అని ఉంచండి):", "108");
-        if (targetNumber != null) {
-            let waUrl = "https://wa.me/" + targetNumber + "?text=" + encodeURIComponent(message);
-            window.open(waUrl, '_blank');
+        let message = "🚨 *అత్యవసర రిపోర్ట్ (GURED)*\n\n📍 *లొకేషన్:* " + finalMapLink;
+        let target = prompt("ఎవరికి పంపాలి? (నంబర్ ఇవ్వండి):", "108");
+        
+        if (target) {
+            // 10 అంకెల నంబర్ అయితే ఆటోమేటిక్‌గా 91 కలుపుతుంది
+            if (target.length === 10 && !isNaN(target)) {
+                target = "91" + target;
+            }
+            window.open("https://wa.me/" + target + "?text=" + encodeURIComponent(message), '_blank');
         }
     }
 </script>
-
 </body>
 </html>
