@@ -3,32 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GURED - ఎమర్జెన్సీ హెల్ప్</title>
+    <title>GURED - India Emergency Help</title>
     <link rel="manifest" href="manifest.json">
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f8d7da; text-align: center; padding: 15px; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); max-width: 400px; margin: auto; border-top: 8px solid #d32f2f; }
-        .btn { width: 100%; padding: 18px; margin-top: 10px; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; }
-        .btn-upload { background-color: #4a5568; color: white; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fce8e6; text-align: center; padding: 15px; margin: 0; }
+        .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); max-width: 450px; margin: 20px auto; border-top: 10px solid #d32f2f; }
+        h2 { color: #d32f2f; margin-bottom: 5px; }
+        p.subtitle { color: #666; font-size: 14px; margin-bottom: 20px; }
+        .btn { width: 100%; padding: 18px; margin-top: 12px; border: none; border-radius: 15px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-upload { background-color: #5a67d8; color: white; }
         .btn-loc { background-color: #e53e3e; color: white; }
-        .btn-wa { background-color: #38a169; color: white; display: none; }
-        #preview { width: 100%; border-radius: 10px; margin-top: 15px; display: none; border: 2px solid #ddd; }
-        #status { color: #d32f2f; font-weight: bold; margin-top: 10px; }
+        .btn-wa { background-color: #2f855a; color: white; display: none; }
+        #preview { width: 100%; border-radius: 12px; margin-top: 15px; display: none; border: 3px solid #eee; }
+        select { width: 100%; padding: 15px; border-radius: 10px; margin-top: 10px; font-size: 16px; border: 2px solid #d32f2f; background: #fff; }
+        label { font-weight: bold; display: block; margin-top: 20px; text-align: left; color: #444; }
+        #status { color: #c53030; font-weight: bold; margin-top: 10px; min-height: 20px; }
     </style>
 </head>
 <body>
+
 <div class="card">
-    <h2>🚨 GURED రిపోర్టర్</h2>
+    <h2>🚨 GURED Reporter</h2>
+    <p class="subtitle">Emergency Assistance | అత్యవసర సహాయం</p>
+    
     <input type="file" accept="image/*" capture="camera" id="incidentPhoto" onchange="previewImage()" style="display: none;">
-    <button class="btn btn-upload" onclick="document.getElementById('incidentPhoto').click()">📸 ఫోటో తీయండి</button>
+    <button class="btn btn-upload" onclick="document.getElementById('incidentPhoto').click()">📸 Take Photo / ఫోటో తీయండి</button>
     <img id="preview" src="">
-    <button class="btn btn-loc" id="locBtn" onclick="getFastLocation()">📍 లొకేషన్ ఫిక్స్ చేయి</button>
+
+    <label>📍 Select State/District (రాష్ట్రం/జిల్లా):</label>
+    <select id="emergencyNumber">
+        <optgroup label="🚨 National (India)">
+            <option value="112">National Emergency (112) - Free</option>
+            <option value="108">Ambulance (108)</option>
+            <option value="100">Police (100)</option>
+        </optgroup>
+        <optgroup label="☀️ Andhra Pradesh">
+            <option value="918518220001">Kurnool (కర్నూలు)</option>
+            <option value="918514220001">Nandyal (నంద్యాల)</option>
+            <option value="918662571234">Vijayawada (విజయవాడ)</option>
+            <option value="918912564321">Visakhapatnam (విశాఖ)</option>
+        </optgroup>
+        <optgroup label="💎 Telangana">
+            <option value="914023451234">Hyderabad (హైదరాబాద్)</option>
+            <option value="918702451234">Warangal (వరంగల్)</option>
+        </optgroup>
+        <optgroup label="🇮🇳 Other States">
+            <option value="112">Karnataka / Tamil Nadu / Others</option>
+        </optgroup>
+    </select>
+
+    <button class="btn btn-loc" id="locBtn" onclick="getFastLocation()">📍 Fix Location / లొకేషన్ పట్టుకో</button>
     <p id="status"></p>
-    <button class="btn btn-wa" id="waBtn" onclick="sendEmergencyAlert()">📲 అలర్ట్ పంపు (WA/SMS)</button>
+
+    <button class="btn btn-wa" id="waBtn" onclick="sendEmergencyAlert()">📲 Send Alert / అలర్ట్ పంపు</button>
 </div>
 
 <script>
     let finalMapLink = "";
+
     function previewImage() {
         const file = document.getElementById('incidentPhoto').files[0];
         const preview = document.getElementById('preview');
@@ -36,87 +68,39 @@
         reader.onloadend = () => { preview.src = reader.result; preview.style.display = "block"; }
         if (file) reader.readAsDataURL(file);
     }
+
     function getFastLocation() {
         let status = document.getElementById("status");
         if (navigator.geolocation) {
-            status.innerHTML = "⏳ లొకేషన్ వెతుకుతున్నాము...";
+            status.innerHTML = "⏳ Finding Location... వెతుకుతున్నాము...";
             navigator.geolocation.getCurrentPosition((pos) => {
                 finalMapLink = "https://www.google.com/maps?q=" + pos.coords.latitude + "," + pos.coords.longitude;
-                status.innerHTML = "✅ లొకేషన్ దొరికింది!";
+                status.innerHTML = "✅ Location Found! లొకేషన్ దొరికింది!";
                 document.getElementById("locBtn").style.display = "none";
                 document.getElementById("waBtn").style.display = "block";
-            }, (err) => { status.innerHTML = "❌ GPS ఆన్ చేయండి."; }, { enableHighAccuracy: true });
+            }, (err) => {
+                status.innerHTML = "❌ Please enable GPS / GPS ఆన్ చేయండి.";
+            }, { enableHighAccuracy: true, timeout: 5000 });
         }
     }
+
     function sendEmergencyAlert() {
-        let message = "🚨 GURED ALERT! Location: " + finalMapLink;
-        let target = prompt("ఎవరికి పంపాలి?", "91");
-        if (target) {
-            if (target.length === 10) target = "91" + target;
-            if (navigator.onLine) {
-                window.open("https://wa.me/" + target + "?text=" + encodeURIComponent(message), '_blank');
-            } else {
-                window.location.href = "sms:" + target + "?body=" + encodeURIComponent(message);
-            }
+        let message = "🚨 *GURED EMERGENCY ALERT*\n\n📍 Location: " + finalMapLink + "\n\nSent via GURED App";
+        let target = document.getElementById("emergencyNumber").value;
+
+        if (navigator.onLine) {
+            // Online: WhatsApp
+            window.open("https://wa.me/" + target + "?text=" + encodeURIComponent(message), '_blank');
+        } else {
+            // Offline/No Balance: SMS
+            window.location.href = "sms:" + target + "?body=" + encodeURIComponent(message);
         }
     }
+
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js');
     }
 </script>
 </body>
-</html>
-const CACHE_NAME = 'gured-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json'
-];
-
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
-});
-
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((res) => res || fetch(e.request))
-  );
-});
-const CACHE_NAME = 'gured-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json'
-];
-
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
-});
-
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((res) => res || fetch(e.request))
-  );
-});
-const CACHE_NAME = 'gured-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json'
-];
-
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
-});
-
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((res) => res || fetch(e.request))
-  );
-});
+    </html>
+    
